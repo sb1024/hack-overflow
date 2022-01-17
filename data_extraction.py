@@ -91,8 +91,8 @@ assert hospital_data_df.shape[0] == hospital_data_df[
                                     ].drop_duplicates().shape[0], \
     'Some ids have more than one row for hospital data for same source file'
 
-inpatient_data_df.to_csv(filtered_inpatient_data_path)
-hospital_data_df.to_csv(filtered_hospital_data_path)
+inpatient_data_df.to_csv(filtered_inpatient_data_path, index=False)
+hospital_data_df.to_csv(filtered_hospital_data_path, index=False)
 
 # store dataframes in dicts to do analyses on each
 data_dict = {
