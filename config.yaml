@@ -1,0 +1,36 @@
+---
+data_paths:
+  input_inpatient: [data/NIS_2016_Core.csv]
+  input_hospital: [data/NIS_2016_Hospital.csv]
+  filtered_inpatient: results/NIS_Core_filtered.csv
+  filtered_hospital: results/NIS_Hospital_filtered.csv
+diagnosis_codes_roots:
+  input_path: input_params/icd_10.csv
+  input_column_name: null  # null if no column name
+  num_diags_to_filter_on: 1
+baseline_analysis:
+  categorical:
+    inpatient:
+      input_path: input_params/inpatient_variables_categorical.csv
+      variable_column: variable  # cannot be null
+      is_root_column: is_root  # cannot be null
+      num_to_plot: 10
+      results_path_root: "results/Inpatient Categorical Base Analysis"
+    hospital:
+      input_path: input_params/hospital_variables_categorical.csv
+      variable_column: variable  # cannot be null
+      is_root_column: is_root  # cannot be null
+      num_to_plot: 10
+      results_path_root: "results/Hospital Categorical Base Analysis"
+  continuous:
+    inpatient:
+      input_path: input_params/inpatient_variables_continuous.csv
+      variable_column: variable  # cannot be null
+      results_path_root: "results/Inpatient Continuous Base Analysis"
+    hospital:
+      input_path: input_params/hospital_variables_continuous.csv
+      variable_column: variable  # cannot be null
+      results_path_root: "results/Hospital Continuous Base Analysis"
+age:
+  min: null  # null if no min age
+  max: null  # null if no max age
