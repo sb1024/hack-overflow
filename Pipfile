@@ -11,6 +11,8 @@ pyyaml = "*"
 matplotlib = "*"
 xlrd = "*"
 openpyxl = "*"
+statsmodels = "*"
+lifelines = "*"
 
 [dev-packages]
 
