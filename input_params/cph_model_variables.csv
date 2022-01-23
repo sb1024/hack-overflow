@@ -1,0 +1,3 @@
+time_variable,event_variable,plot_type,exclude_variable,exclude_value
+los,discharged,cumulative_density,died,1
+los,died,survival_function,,

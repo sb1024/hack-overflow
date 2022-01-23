@@ -1,36 +1,82 @@
 ---
-data_paths:
-  input_inpatient: [data/NIS_2016_Core.csv]
-  input_hospital: [data/NIS_2016_Hospital.csv]
-  filtered_inpatient: results/NIS_Core_filtered.csv
-  filtered_hospital: results/NIS_Hospital_filtered.csv
-diagnosis_codes_roots:
-  input_path: input_params/icd_10.csv
-  input_column_name: null  # null if no column name
-  num_diags_to_filter_on: 1
-baseline_analysis:
-  categorical:
-    inpatient:
-      input_path: input_params/inpatient_variables_categorical.csv
-      variable_column: variable  # cannot be null
-      is_root_column: is_root  # cannot be null
-      num_to_plot: 10
-      results_path_root: "results/Inpatient Categorical Base Analysis"
-    hospital:
-      input_path: input_params/hospital_variables_categorical.csv
-      variable_column: variable  # cannot be null
-      is_root_column: is_root  # cannot be null
-      num_to_plot: 10
-      results_path_root: "results/Hospital Categorical Base Analysis"
-  continuous:
-    inpatient:
-      input_path: input_params/inpatient_variables_continuous.csv
-      variable_column: variable  # cannot be null
-      results_path_root: "results/Inpatient Continuous Base Analysis"
-    hospital:
-      input_path: input_params/hospital_variables_continuous.csv
-      variable_column: variable  # cannot be null
-      results_path_root: "results/Hospital Continuous Base Analysis"
-age:
-  min: null  # null if no min age
-  max: null  # null if no max age
+default:
+  data_paths:
+    input_inpatient: [data/NIS_2016_Core.csv]
+    input_hospital: [data/NIS_2016_Hospital.csv]
+    filtered_inpatient: results/NIS_Core_filtered.csv
+    filtered_hospital: results/NIS_Hospital_filtered.csv
+  diagnosis_codes_roots:
+    input_path: input_params/icd_10.csv
+    input_column_name: null  # null if no column name
+    num_diags_to_filter_on: 1
+  baseline_analysis:
+    categorical:
+      inpatient:
+        input_path: input_params/inpatient_variables_categorical.csv
+        variable_column: variable  # cannot be null
+        is_root_column: is_root  # cannot be null
+        num_to_plot: 10
+        results_path_root: "results/Inpatient Categorical Base Analysis"
+      hospital:
+        input_path: input_params/hospital_variables_categorical.csv
+        variable_column: variable  # cannot be null
+        is_root_column: is_root  # cannot be null
+        num_to_plot: 10
+        results_path_root: "results/Hospital Categorical Base Analysis"
+    continuous:
+      inpatient:
+        input_path: input_params/inpatient_variables_continuous.csv
+        variable_column: variable  # cannot be null
+        results_path_root: "results/Inpatient Continuous Base Analysis"
+      hospital:
+        input_path: input_params/hospital_variables_continuous.csv
+        variable_column: variable  # cannot be null
+        results_path_root: "results/Hospital Continuous Base Analysis"
+  age:
+    min: null  # null if no min age
+    max: null  # null if no max age
+  generate_groups:
+    variable_column: hosp_bedsize
+    group_column: group
+    results_path: results/NIS_Core_Hospital_grouped.csv
+    group1:  # control group
+      min: 1
+      max: 1
+      list: null
+      name: 'Hospital Bed Size of 1'
+    group2:  # treatment group
+      min: 2
+      max: null
+      list: null
+      name: 'Hospital Bed Size of More than 1'
+  cci:
+    # https://strokengine.ca/en/assessments/charlson-comorbidity-index-cci/
+    diag_columns_prefix: i10_dx
+    weights_path: input_params/cci_weights.csv  # https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6684052/ for diabwc
+    cci_category_column: category
+    cci_weight_column: weight
+    results_path: results/NIS_Core_Hospitalized_grouped_cci.csv
+  matching:
+    seed: 1  # seed for matching
+    input_path: input_params/matching_variables.csv
+    variable_column: variable  # cannot be null
+    ratio: 1  # ratio of group2 (treatment) to group1 (control) for matching
+    caliper: 0.1  # caliper argument for matching
+    nearest: True  # nearest argument for matching
+    distance: logit  # distance argument for matching
+    m.order: smallest  # m.order argument for matching
+    discard: control  # discard argument for matching
+    results_path: results/matched_inpatient.csv
+    results_summary_path: results/matched_inpatient_summary.txt
+  proportion_outcomes:
+    input_path: input_params/proportion_outcome_variables.csv
+    variable_column: variable  # cannot be null
+    results_path_root: 'results/Proportion Outcome'
+  cph_model:
+    input_path: input_params/cph_model_variables.csv
+    time_variable_column: time_variable  # cannot be null
+    event_variable_column: event_variable  # cannot be null
+    plot_type_column: plot_type  # cannot be null, values must be cumulative_density or survival_function
+    exclude_variable_column: exclude_variable  # cannot be null
+    exclude_value_column: exclude_value  # cannot be null
+    results_path_root: 'results/'
