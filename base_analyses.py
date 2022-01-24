@@ -92,7 +92,7 @@ def continuous_base_analysis(data_dict, input_continuous_variables_dict):
                 plt.hist(data_df[variable].to_list())
                 plt.title(f'{variable} Distribution across {name_for_graph}')
                 plt.xlabel(variable)
-                plt.ylabel(f'{variable}')
+                plt.ylabel(f'Frequency')
 
                 plt.savefig(f'{results_path_root} for {variable}, n={n}.png', bbox_inches='tight')
                 plt.close('all')

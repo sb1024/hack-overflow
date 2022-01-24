@@ -4,6 +4,8 @@ import pandas as pd
 from statsmodels.stats.proportion import proportions_ztest, proportion_confint
 import matplotlib.pyplot as plt
 from lifelines import KaplanMeierFitter, CoxPHFitter
+from base_analyses import continuous_base_analysis
+
 
 original_stdout = sys.stdout  # Save a reference to the original standard output
 
@@ -19,6 +21,7 @@ group_2_name = config['generate_groups']['group2']['name']
 
 proportion_outcomes_input_path = config['proportion_outcomes']['input_path']
 proportion_outcomes_variable_column = config['proportion_outcomes']['variable_column']
+proportion_outcomes_title_column = config['proportion_outcomes']['title_column']
 proportion_results_path_root = config['proportion_outcomes']['results_path_root']
 
 cph_model_input_path = config['cph_model']['input_path']
@@ -27,15 +30,20 @@ cph_model_event_variable_column = config['cph_model']['event_variable_column']
 cph_model_plot_type_column = config['cph_model']['plot_type_column']
 cph_model_exclude_variable_column = config['cph_model']['exclude_variable_column']
 cph_model_exclude_value_column = config['cph_model']['exclude_value_column']
+cph_model_x_axis_column = config['cph_model']['x_axis_column']
+cph_model_y_axis_column = config['cph_model']['y_axis_column']
+cph_model_title_column = config['cph_model']['title_column']
 cph_results_path_root = config['cph_model']['results_path_root']
 
 inpatient_id_col = 'key_nis'
 
 all_data_df = pd.read_csv(data_path)
+# filter so z in 0 or 1
+all_data_df = all_data_df[all_data_df['z'].isin([0, 1])].reset_index(drop=True)
+
 matching_df = pd.read_csv(matching_path)
 
 proportion_variables_df = pd.read_csv(proportion_outcomes_input_path)
-proportion_variables = proportion_variables_df[proportion_outcomes_variable_column].to_list()
 
 cph_variables_df = pd.read_csv(cph_model_input_path)
 
@@ -55,7 +63,9 @@ data_dict = {
 
 # proportion analysis
 for data_name, df in data_dict.items():
-    for var in proportion_variables:
+    for index, row in proportion_variables_df.iterrows():
+        var = row[proportion_outcomes_variable_column]
+        title = row[proportion_outcomes_title_column]
         # filter out without var
         inpatients_without_var = df.loc[pd.isna(df[var]), inpatient_id_col].to_list()
 
@@ -83,10 +93,10 @@ for data_name, df in data_dict.items():
         lower_y_err = props - lower
         upper_y_err = upper - props
         plt.bar(x=df_agg[group_column].to_list(), height=props.to_list(), yerr=[lower_y_err, upper_y_err])
-        plt.title(f'Proportion for {var}--{data_name}, n={n}, p={pval:.2e}')
+        plt.title(f'{title}--{data_name}, n={n}, p={pval:.2e}')
         plt.xlabel('Group')
-        plt.ylabel(f'Proportion for {var}')
-        plt.xticks(rotation=30, horizontalalignment='right')
+        plt.ylabel(f'{title}')
+        # plt.xticks(rotation=30, horizontalalignment='right')
         plt.savefig(f'{proportion_results_path_root} for {var}--{data_name}, n={n}, p={pval:.2e}.png',
                     bbox_inches='tight')
         plt.close('all')
@@ -99,6 +109,9 @@ for data_name, df in data_dict.items():
         plot_type = row[cph_model_plot_type_column]
         exclude_variable = row[cph_model_exclude_variable_column]
         exclude_value = row[cph_model_exclude_value_column]
+        x_axis = row[cph_model_x_axis_column]
+        y_axis = row[cph_model_y_axis_column]
+        title = row[cph_model_title_column]
 
         if plot_type not in ['cumulative_density', 'survival_function']:
             print('Plot type must be either cumulative_density or survival_function')
@@ -125,11 +138,7 @@ for data_name, df in data_dict.items():
         analysis_df = df[~df[inpatient_id_col].isin(inpatients_to_remove)].reset_index(drop=True)
         n = analysis_df[inpatient_id_col].nunique()
 
-        if plot_type == 'cumulative_density':
-            title = f'Cumulative Density Plot for {event_variable} over {time_variable}--{data_name}, n={n}'
-        else:
-            title = f'Survival Plot for {event_variable} over {time_variable}--{data_name}, n={n}'
-
+        title = f'{title}--{data_name}, n={n}'
         kmf = KaplanMeierFitter()
         kmf_ax = None
         for z in [0, 1]:
@@ -142,8 +151,8 @@ for data_name, df in data_dict.items():
             else:
                 kmf_ax = kmf.plot_survival_function()
 
-        kmf_ax.set_xlabel(time_variable)
-        kmf_ax.set_ylabel(event_variable)
+        kmf_ax.set_xlabel(x_axis)
+        kmf_ax.set_ylabel(y_axis)
         kmf_ax.set_title(title)
         kmf_fig = kmf_ax.get_figure()
 
@@ -160,3 +169,31 @@ for data_name, df in data_dict.items():
 
         kmf_fig.savefig(f'{cph_results_path_root} {title}', bbox_inches='tight')
         plt.close('all')
+
+# include CCI dist
+data_dict = {
+    'All': {
+        'df': all_data_df,
+        'id_col': inpatient_id_col,
+        'name_for_graph': 'Inpatient Visits',
+    },
+    'Matched': {
+        'df': matched_data_df,
+        'id_col': inpatient_id_col,
+        'name_for_graph': 'Inpatient Visits',
+    }
+
+}
+input_continuous_variables_dict = {
+    'All': {
+        'input_path': 'input_params/inpatient_cci.csv',
+        'variable_column': 'variable',
+        'results_path_root': 'results/Inpatient CCI Analysis',
+    },
+    'Matched': {
+        'input_path': 'input_params/inpatient_cci.csv',
+        'variable_column': 'variable',
+        'results_path_root': 'results/Inpatient CCI Analysis',
+    },
+}
+continuous_base_analysis(data_dict, input_continuous_variables_dict)
