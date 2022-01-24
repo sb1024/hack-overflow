@@ -36,19 +36,19 @@ default:
     min: null  # null if no min age
     max: null  # null if no max age
   generate_groups:
-    variable_column: hosp_bedsize
+    variable_column: race
     group_column: group
     results_path: results/NIS_Core_Hospital_grouped.csv
     group1:  # control group
-      min: 1
-      max: 1
-      list: null
-      name: 'Hospital Bed Size of 1'
-    group2:  # treatment group
-      min: 2
+      min: null
       max: null
-      list: null
-      name: 'Hospital Bed Size of More than 1'
+      list: [1]
+      name: 'White'
+    group2:  # treatment group
+      min: null
+      max: null
+      list: [2, 3, 4, 5, 6]
+      name: 'Non-White'
   cci:
     # https://strokengine.ca/en/assessments/charlson-comorbidity-index-cci/
     diag_columns_prefix: i10_dx
@@ -71,6 +71,7 @@ default:
   proportion_outcomes:
     input_path: input_params/proportion_outcome_variables.csv
     variable_column: variable  # cannot be null
+    title_column: title  # cannot be null
     results_path_root: 'results/Proportion Outcome'
   cph_model:
     input_path: input_params/cph_model_variables.csv
@@ -79,4 +80,7 @@ default:
     plot_type_column: plot_type  # cannot be null, values must be cumulative_density or survival_function
     exclude_variable_column: exclude_variable  # cannot be null
     exclude_value_column: exclude_value  # cannot be null
+    x_axis_column: x_axis  # cannot be null
+    y_axis_column: y_axis  # cannot be null
+    title_column: title  # cannot be null
     results_path_root: 'results/'

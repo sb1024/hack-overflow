@@ -1,3 +1,3 @@
-time_variable,event_variable,plot_type,exclude_variable,exclude_value
-los,discharged,cumulative_density,died,1
-los,died,survival_function,,
+time_variable,event_variable,plot_type,exclude_variable,exclude_value,x_axis,y_axis,title
+los,discharged,cumulative_density,died,1,Length of Stay (Days),Proportion Discharged,Cumulative Density for Discharges over Time
+los,died,survival_function,,,Length of Stay (Days),Survival,Survival over Time
