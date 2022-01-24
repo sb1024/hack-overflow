@@ -1,0 +1,23 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r}
+df = read.csv("analysis_df.csv")
+one_way = aov(Stay_length~Race+Age+Urban+Gender+Payer+ADMS_to_PRO+Bedsize+Teaching+Control+cci, data = df)
+summary(one_way)
+```
+```{r}
+print(one_way$coefficients)
+```
+
+```{r}
+one_way = aov(Death~Race+Age+Urban+Gender+Payer+ADMS_to_PRO+Bedsize+Teaching+Control+cci, data = df)
+summary(one_way)
+```
+
+```{r}
+print(one_way$coefficients)
+```
+
